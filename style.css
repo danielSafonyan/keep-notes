@@ -226,10 +226,6 @@ input:focus {
         0 1px 3px 1px rgba(60, 64, 67, 0.149);
 }
 
-.note:hover .toolbar {
-    opacity: 1;
-}
-
 .note-title {
     padding-top: 12px;
     letter-spacing: 0.00625em;
@@ -266,22 +262,21 @@ input:focus {
     align-items: center;
     color: rgba(0, 0, 0, 0.54);
     display: flex;
-    gap: 0.5rem;
     font-size: 12px;
     line-height: 26px;
-    margin: 0.5rem;
+    margin: 0.5em;
     position: relative;
     transition: opacity 0.218s ease-in-out, background-color 0.218s ease-in-out,
         box-shadow 0.218s ease-in-out;
 }
 
-.toolbar:hover {
+.note:hover .toolbar {
     opacity: 1;
 }
 
-.fa-pen-to-square,
-.fa-paint-roller {
-    font-size: 1rem;
+.fa-paint-roller, .fa-trash-can {
+    font-weight: 1rem;
+    padding: 0.5rem;
     cursor: pointer;
     color: #202124;
     opacity: 0.71;
@@ -327,7 +322,7 @@ input:focus {
     width: 100%;
     height: 100%;
     background-color: rgba(229, 229, 229, 0.5);
-    opacity: 0;
+    opacity: 1;
     visibility: hidden;
     transform: scale(1.1);
     transition: visibility 0s linear 0.25s, opacity 0.25s 0s, transform 0.25s;
