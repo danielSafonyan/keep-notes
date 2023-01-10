@@ -34,15 +34,51 @@ class App {
         this.$formBtns.style.display = 'none'
     }
 
+    handleFormClick(event) {
+        this.openForm(event)
+    }
+
+    handleNoteClick(event) {
+        this.deleteNote(event)
+        this.editNoteText(event)
+        this.openNoteColorTooltip(event)
+    }
+
+    editNoteColor(event) {
+        if (!event.target.matches('.color-option')) return
+        const noteId = this.selectedNote.dataset.id
+        const color = event.target.dataset.color
+        if (color) this.selectedNote.style.background = color
+        console.log(noteId, color)
+
+        this.notes = this.notes.map(el => el.id === noteId ? {
+            ...el,
+            color
+        } : el)
+        this.saveLocalStorage()
+    }
+
+    openNoteColorTooltip(event) {
+        if (!event.target.matches('.fa-paint-roller')) return
+        this.selectedNote = event.target.closest('.note')
+        const { x, y } = event
+        this.$colorTooltip.style.display = 'flex'
+        this.$colorTooltip.style.top = y + 10
+        this.$colorTooltip.style.left = x + 10
+    }
+
+    closeColorTooltip() {
+        this.$colorTooltip.style.display = 'none'
+    }
+
     applyEventListners() {
         document.addEventListener('click', event => {
-            if (this.$form.contains(event.target)) {
-                this.openForm(event)
-            } else {
-                this.closeForm(event)
-            }
-            this.deleteNote(event)
-            this.editNote(event)
+            if (event.target.closest('#color-tooltip')) {
+                this.editNoteColor(event)
+            } else { this.closeColorTooltip()}
+
+            if (this.$form.contains(event.target)) { this.handleFormClick(event) }
+            if (event.target.closest('.note')) { this.handleNoteClick(event) }
         })
 
         this.$form.addEventListener('submit', event => {
@@ -67,7 +103,7 @@ class App {
         })
     }
 
-    editNote(event) {
+    editNoteText(event) {
         const isNote = event.target.closest('.note')
         if(!isNote) return 
 
@@ -89,13 +125,11 @@ class App {
         const [modalTtitle, modalText] = this.$modal.children[0].children
         const [title, text] = [modalTtitle.value, modalText.value]
         const noteId = this.selectedNote.dataset.id
-        console.log(noteId)
-        console.log(title, text)
+
         this.notes = this.notes.map(el => el.id === noteId ? {
-            id: noteId,
+            ...el,
             title,
-            text,
-            color: '#fff'
+            text
         } : el)
         this.$modal.classList.toggle('open-modal')
         this.displayNotes()
