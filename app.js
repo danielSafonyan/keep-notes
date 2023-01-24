@@ -3,11 +3,9 @@ import { v4 } from 'https://cdn.skypack.dev/uuid'
 
 class App {
     constructor() {
-        // get notes from local storage if any, otherwise initialize an empty array
         this.notes = JSON.parse(localStorage.getItem('notes')) || []
         this.selectedNote = ''
 
-        // get reference to DOM elements
         this.$modal = document.getElementById('modal')
         this.$form = document.getElementById('form')
         this.$noteTitle = document.getElementById('note-title')
@@ -41,7 +39,6 @@ class App {
 
     handleNoteClick(event) {
         const note = event.target.closest('.note')
-        // checking if the click was inside a valid note
         if(!note) return 
 
         if (event.target.matches('.fa-trash-can')) this.deleteNote(note.dataset.id)
