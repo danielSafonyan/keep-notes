@@ -1,10 +1,13 @@
+// v4 is used to generate uuid for new notes
 import { v4 } from 'https://cdn.skypack.dev/uuid'
 
 class App {
     constructor() {
+        // get notes from local storage if any, otherwise initialize an empty array
         this.notes = JSON.parse(localStorage.getItem('notes')) || []
         this.selectedNote = ''
 
+        // get reference to DOM elements
         this.$modal = document.getElementById('modal')
         this.$form = document.getElementById('form')
         this.$noteTitle = document.getElementById('note-title')
@@ -21,10 +24,6 @@ class App {
     }
 
     openForm(event) {
-        if (event.target === this.$formCloseBtn) {
-            this.closeForm()
-            return
-        }
         this.$noteTitle.style.display = 'block'
         this.$formBtns.style.display = 'block'
     }
@@ -35,13 +34,38 @@ class App {
     }
 
     handleFormClick(event) {
-        this.openForm(event)
+        if (event.target === this.$formCloseBtn) {
+            this.closeForm()
+        } else this.openForm(event)
     }
 
     handleNoteClick(event) {
-        this.deleteNote(event)
-        this.editNoteText(event)
-        this.openNoteColorTooltip(event)
+        const note = event.target.closest('.note')
+        // checking if the click was inside a valid note
+        if(!note) return 
+
+        if (event.target.matches('.fa-trash-can')) this.deleteNote(note.dataset.id)
+        else if (event.target.matches('.fa-paint-roller')) this.openNoteColorTooltip(event)
+        else this.editNoteText(note)
+    }
+
+    deleteNote(noteId) {
+        this.notes = this.notes.filter(el => el.id !== noteId)
+        this.displayNotes()
+        this.saveLocalStorage()
+    }
+    
+    editNoteText(note) {
+        this.selectedNote = note
+        this.openModal()
+    }
+
+    openNoteColorTooltip(event) {
+        this.selectedNote = event.target.closest('.note')
+        const { x, y } = event
+        this.$colorTooltip.style.display = 'flex'
+        this.$colorTooltip.style.top = y + 10
+        this.$colorTooltip.style.left = x + 10
     }
 
     editNoteColor(event) {
@@ -56,15 +80,6 @@ class App {
             color
         } : el)
         this.saveLocalStorage()
-    }
-
-    openNoteColorTooltip(event) {
-        if (!event.target.matches('.fa-paint-roller')) return
-        this.selectedNote = event.target.closest('.note')
-        const { x, y } = event
-        this.$colorTooltip.style.display = 'flex'
-        this.$colorTooltip.style.top = y + 10
-        this.$colorTooltip.style.left = x + 10
     }
 
     closeColorTooltip() {
@@ -103,15 +118,6 @@ class App {
         })
     }
 
-    editNoteText(event) {
-        const isNote = event.target.closest('.note')
-        if(!isNote) return 
-
-        const deleteOrColor = event.target.matches('.fa-paint-roller') || event.target.matches('.fa-trash-can')
-        if (deleteOrColor) return
-        this.selectedNote = isNote
-        this.openModal()
-    }
 
     openModal() {
         const [modalTtitle, modalText] = this.$modal.children[0].children
@@ -136,14 +142,6 @@ class App {
         this.saveLocalStorage()
     }
 
-    deleteNote(event) {
-        if (!event.target.matches('.fa-trash-can')) return
-        const noteId = event.target.closest('.note').dataset.id
-        this.notes = this.notes.filter(el => el.id !== noteId)
-        this.displayNotes()
-        this.saveLocalStorage()
-    }
-    
     saveLocalStorage() {
         localStorage.setItem('notes', JSON.stringify(this.notes))
     }
@@ -174,8 +172,3 @@ class App {
 }
 
 new App()
-
-// note-title
-// note-text
-// submit-button
-// form-close-button
